@@ -64,6 +64,9 @@ td.tot{font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
 .sup div{flex:1}
 .sync{font-size:12px;opacity:.75}
 .err.ok{color:var(--ac)}
+.inst{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));background:var(--hd);color:var(--hdt);border-radius:10px;padding:12px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;z-index:8;box-shadow:0 4px 18px rgba(0,0,0,.25);max-width:560px;margin:0 auto}
+.inst span{flex:1;min-width:200px;font-size:14px}
+.inst .btn.ghost{color:var(--hdt);border-color:var(--mut)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--hd);color:var(--hdt);padding:9px 16px;border-radius:8px;z-index:9}
 </style>
 </head>
@@ -267,17 +270,42 @@ function tabPerfil(){
  <div class="grid"><div><label for="pt">Telefone WhatsApp</label><input id="pt" value="${esc(p.tel)}"></div><div><label for="pf">Função na empresa</label><input id="pf" value="${esc(p.funcao)}"></div></div>
  <label for="pa">Endereço</label><input id="pa" value="${esc(p.endereco)}">
  <label>E-mail</label><input value="${esc(USER.email)}" disabled>
- <div class="err" id="er"></div><div class="row" style="margin-top:14px"><button class="btn" id="sv">Salvar perfil</button></div></div>`;
- pickAvatar();
+ <div class="err" id="er"></div><div class="row" style="margin-top:14px"><button class="btn" id="sv">Salvar perfil</button><button class="btn ghost" id="inst2">Instalar aplicativo</button></div></div>`;
+ pickAvatar();$("#inst2").onclick=installNow;
  $("#sv").onclick=async()=>{const v={nome:$("#pn").value.trim()||p.nome,tel:$("#pt").value.trim(),funcao:$("#pf").value.trim(),endereco:$("#pa").value.trim(),foto:pendAvatar||null};
   const {error}=await sb.from("profiles").update(v).eq("id",USER.id);if(error){$("#er").textContent="Não foi possível salvar o perfil.";return}
   S.profile={...p,...v};toast("Perfil salvo.");renderApp()};
 }
 
+/* ---------- Instalador (PWA) ---------- */
+let deferredInstall=null;
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+function installBar(){
+ const old=document.getElementById("inst");if(old)old.remove();
+ let no=null;try{no=sessionStorage.getItem("gc_inst_no")}catch(e){}
+ if(isStandalone()||no)return;
+ let msg,btn="";
+ if(deferredInstall){msg="Instale o GC-Pedidos no seu celular para abrir como um aplicativo.";btn=`<button class="btn sm" id="inst-go">Instalar aplicativo</button>`}
+ else if(isIOS()){msg="Para instalar: toque em Compartilhar e depois em “Adicionar à Tela de Início”."}
+ else return;
+ const b=document.createElement("div");b.id="inst";b.className="inst";
+ b.innerHTML=`<span>${msg}</span>${btn}<button class="btn ghost sm" id="inst-no">Agora não</button>`;
+ document.body.appendChild(b);
+ const g=document.getElementById("inst-go");if(g)g.onclick=installNow;
+ document.getElementById("inst-no").onclick=()=>{try{sessionStorage.setItem("gc_inst_no","1")}catch(e){}b.remove()};
+}
+async function installNow(){
+ if(isStandalone()){toast("O aplicativo já está instalado.");return}
+ if(deferredInstall){const d=deferredInstall;deferredInstall=null;d.prompt();try{await d.userChoice}catch(e){}installBar();return}
+ alert(isIOS()?"No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.":"No Chrome, toque no menu ⋮ e escolha “Instalar app” ou “Adicionar à tela inicial”.")}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;installBar()});
+window.addEventListener("appinstalled",()=>{deferredInstall=null;installBar();toast("Aplicativo instalado.")});
+
 function render(){
  if(!configured||!sb){return renderSetup()}
  ({loading:renderLoading,login:renderLogin,register:renderRegister,forgot:renderForgot,newpass:renderNewPass,app:renderApp})[view]()}
-render();
+render();installBar();
 setTimeout(()=>{if(view==="loading"){view="login";render()}},8000);
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 </script>
