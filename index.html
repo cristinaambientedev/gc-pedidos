@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>GC-Pedidos</title>
+<meta name="theme-color" content="#0f766e">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="GC-Pedidos">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#eef2f1;--sf:#fff;--ink:#12303a;--mut:#5b727a;--ln:#d3dfdd;--ac:#0f766e;--acx:#fff;--wa:#128c4a;--warn:#b45309;--bad:#b91c1c;--hd:#12303a;--hdt:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1a1e;--sf:#16272d;--ink:#e6f0ee;--mut:#8fa8ae;--ln:#294249;--ac:#2dd4bf;--acx:#06201d;--wa:#34d27b;--warn:#f59e0b;--bad:#f87171;--hd:#0a1316;--hdt:#e6f0ee}}
+:root[data-theme="dark"]{--bg:#0e1a1e;--sf:#16272d;--ink:#e6f0ee;--mut:#8fa8ae;--ln:#294249;--ac:#2dd4bf;--acx:#06201d;--wa:#34d27b;--warn:#f59e0b;--bad:#f87171;--hd:#0a1316;--hdt:#e6f0ee}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "IBM Plex Sans",system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.btn{background:var(--ac);color:var(--acx);border:0;border-radius:6px;padding:9px 14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ln)}
+.btn.wa{background:var(--wa);color:#fff}
+.btn.sm{padding:5px 9px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+input,select{background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:8px 10px;width:100%}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 3px}
+.auth{max-width:440px;margin:24px auto;padding:0 16px}
+.card{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:20px}
+.brand{font-size:28px;font-weight:700;letter-spacing:-.5px;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 12px}
+.link{background:none;border:0;color:var(--ac);cursor:pointer;padding:4px 0;text-decoration:underline}
+.err{color:var(--bad);font-size:13px;min-height:18px;margin-top:8px}
+.ok{color:var(--ac)}
+.avatar{width:84px;height:84px;border-radius:50%;background:var(--ln) center/cover;display:flex;align-items:center;justify-content:center;color:var(--mut);font-size:12px;cursor:pointer;border:2px solid var(--ln);margin:0 auto;text-align:center}
+header{background:var(--hd);color:var(--hdt);display:flex;align-items:center;gap:12px;padding:10px 16px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header b{font-size:18px;letter-spacing:-.3px}
+header .who{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:13px}
+header .av{width:32px;height:32px;border-radius:50%;background:var(--ln) center/cover}
+nav{display:flex;gap:4px;padding:10px 16px 0;max-width:1100px;margin:0 auto;overflow-x:auto}
+nav button{background:none;border:0;border-bottom:3px solid transparent;padding:8px 12px;cursor:pointer;color:var(--mut);font-weight:600;white-space:nowrap}
+nav button.on{color:var(--ink);border-color:var(--ac)}
+main{max-width:1100px;margin:0 auto;padding:14px 16px 40px}
+.tw{overflow-x:auto;background:var(--sf);border:1px solid var(--ln);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:860px}
+th{text-align:left;font-size:13px;color:var(--mut);font-weight:600;padding:8px 6px;border-bottom:1px solid var(--ln);background:var(--bg)}
+td{padding:3px;border-bottom:1px solid var(--ln)}
+td input,td select{border-color:transparent;background:transparent;padding:6px}
+td input:hover,td input:focus,td select:hover{border-color:var(--ln);background:var(--sf)}
+td.tot{font-weight:700;text-align:center;font-variant-numeric:tabular-nums}
+.low{color:var(--warn)}.neg{color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+.ord{display:grid;grid-template-columns:28px 1fr 90px 110px;gap:8px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--ln)}
+.ord small{color:var(--mut);display:block}
+.ord input[type=checkbox]{width:20px;height:20px}
+.sup{display:flex;gap:8px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--ln)}
+.sup div{flex:1}
+.sync{font-size:12px;opacity:.75}
+.err.ok{color:var(--ac)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--hd);color:var(--hdt);padding:9px 16px;border-radius:8px;z-index:9}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.104.1/dist/umd/supabase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2800)}
+function dlFile(name,blob){const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+const waUrl=(wa,txt)=>{let d=String(wa).replace(/\D/g,"");if(d.length<=11)d="55"+d;return `https://wa.me/${d}?text=${encodeURIComponent(txt)}`};
+
+/* ---------- Supabase ---------- */
+const cfg=window.GC_CONFIG||{};
+const configured=!!(cfg.SUPABASE_URL&&cfg.SUPABASE_KEY)&&!/COLE_AQUI/.test(cfg.SUPABASE_URL+cfg.SUPABASE_KEY);
+const sb=configured&&window.supabase?window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_KEY):null;
+let USER=null,S={profile:null,products:[],suppliers:[],orders:[]};
+let view="loading",tab="estoque",pendAvatar="",supSel="",sel={},timers={},flash="",bootedFor=null,ch=null,rt=null;
+const tot=p=>(+p.q1||0)-(+p.q2||0);
+const trad=m=>/Invalid login/i.test(m)?"E-mail ou senha incorretos.":/not confirmed/i.test(m)?"Confirme seu e-mail antes de entrar. Procure a mensagem na caixa de entrada.":/already registered/i.test(m)?"Este e-mail já tem conta. Entre ou recupere a senha.":/rate limit|too many|seconds/i.test(m)?"Muitas tentativas. Aguarde um pouco e tente de novo.":/password/i.test(m)?"A senha precisa ter pelo menos 6 caracteres.":"Algo deu errado: "+m;
+const setSync=t=>{const e=$("#sync");if(e)e.textContent=t};
+
+async function loadAll(){
+ const [a,b,c,d]=await Promise.all([sb.from("profiles").select("*").eq("id",USER.id).maybeSingle(),sb.from("products").select("*").order("created_at"),sb.from("suppliers").select("*").order("nome"),sb.from("orders").select("*").order("created_at",{ascending:false}).limit(150)]);
+ if(a.error||b.error||c.error||d.error){toast("Não foi possível carregar os dados. Verifique a conexão.");return false}
+ S={profile:a.data||{nome:USER.email,tel:"",endereco:"",funcao:"",foto:null},products:b.data,suppliers:c.data,orders:d.data};
+ try{const pf=localStorage.getItem("gc_pending_foto");if(pf&&!S.profile.foto){const r=await sb.from("profiles").update({foto:pf}).eq("id",USER.id);if(!r.error){S.profile.foto=pf;localStorage.removeItem("gc_pending_foto")}}}catch(e){}
+ return true}
+function subscribeRT(){if(ch)return;ch=sb.channel("gc").on("postgres_changes",{event:"*",schema:"public"},schedReload).subscribe()}
+function schedReload(){clearTimeout(rt);rt=setTimeout(async function go(){const a=document.activeElement;if(Object.keys(timers).length||(a&&/INPUT|SELECT/.test(a.tagName))){rt=setTimeout(go,2500);return}if(view==="app"&&await loadAll())renderApp()},700)}
+async function enterApp(){const ok=await loadAll();if(ok){view="app";subscribeRT()}else{view="login"}render()}
+
+if(sb){sb.auth.onAuthStateChange((ev,session)=>{
+ if(ev==="PASSWORD_RECOVERY"){USER=session?.user||null;view="newpass";setTimeout(render,0);return}
+ if(ev==="SIGNED_OUT"){USER=null;bootedFor=null;S={profile:null,products:[],suppliers:[],orders:[]};if(ch){sb.removeChannel(ch);ch=null}view="login";setTimeout(render,0);return}
+ if(!session){if(ev==="INITIAL_SESSION"){view="login";setTimeout(render,0)}return}
+ if(session.user.id!==bootedFor&&view!=="newpass"){bootedFor=session.user.id;USER=session.user;setTimeout(enterApp,0)}
+})}
+
+/* ---------- Telas de acesso ---------- */
+function authShell(inner){return `<div class="auth"><div class="card"><h1 class="brand">GC-Pedidos</h1>${inner}</div></div>`}
+function renderSetup(){$("#app").innerHTML=authShell(`<p class="sub">Falta ligar o aplicativo ao Supabase.</p><p>Abra o arquivo <b>config.js</b>, cole a URL do projeto e a chave publishable e publique o site de novo. O passo a passo está em LEIA-ME-SUPABASE.md.</p>`)}
+function renderLoading(){$("#app").innerHTML=authShell(`<p class="sub">Carregando…</p>`)}
+function renderLogin(){
+ $("#app").innerHTML=authShell(`<p class="sub">Entre para controlar seu estoque e enviar pedidos.</p>
+ <label for="le">E-mail</label><input id="le" type="email" autocomplete="username">
+ <label for="lp">Senha</label><input id="lp" type="password" autocomplete="current-password">
+ <div class="err ${flash?"ok":""}" id="er">${esc(flash)}</div>
+ <div class="row" style="margin-top:6px"><button class="btn" id="go">Entrar</button><button class="link" id="fg">Esqueci a senha</button></div>
+ <hr style="border:0;border-top:1px solid var(--ln)"><button class="link" id="cr">Criar conta de gerente de compras</button>`);flash="";
+ $("#fg").onclick=()=>{view="forgot";render()};$("#cr").onclick=()=>{view="register";pendAvatar="";render()};
+ const go=async()=>{$("#go").disabled=true;const {error}=await sb.auth.signInWithPassword({email:$("#le").value.trim().toLowerCase(),password:$("#lp").value});$("#go").disabled=false;if(error){$("#er").className="err";$("#er").textContent=trad(error.message)}};
+ $("#go").onclick=go;$("#lp").onkeydown=e=>{if(e.key==="Enter")go()};
+}
+function pickAvatar(){
+ $("#av").onclick=()=>$("#file").click();
+ $("#file").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const c=document.createElement("canvas");c.width=c.height=160;const x=c.getContext("2d"),s=Math.min(im.width,im.height);x.drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,160,160);pendAvatar=c.toDataURL("image/jpeg",.8);$("#av").style.backgroundImage=`url(${pendAvatar})`;$("#av").textContent=""};im.src=r.result};r.readAsDataURL(f)};
+}
+function renderRegister(){
+ $("#app").innerHTML=authShell(`<p class="sub">Crie sua conta de gerente de compras.</p>
+ <div class="avatar" id="av" style="${pendAvatar?`background-image:url(${pendAvatar})`:""}">${pendAvatar?"":"Adicionar foto"}</div>
+ <input id="file" type="file" accept="image/*" hidden>
+ <label for="rn">Nome completo</label><input id="rn" autocomplete="name">
+ <div class="grid"><div><label for="rt">Telefone WhatsApp</label><input id="rt" type="tel" placeholder="(77) 99999-9999"></div>
+ <div><label for="rf">Função na empresa</label><input id="rf" placeholder="Gerente de compras"></div></div>
+ <label for="ra">Endereço</label><input id="ra" autocomplete="street-address">
+ <label for="re">E-mail</label><input id="re" type="email" autocomplete="email">
+ <div class="grid"><div><label for="rp">Senha</label><input id="rp" type="password" autocomplete="new-password"></div>
+ <div><label for="rc">Confirmar senha</label><input id="rc" type="password" autocomplete="new-password"></div></div>
+ <div class="err" id="er"></div>
+ <div class="row" style="margin-top:6px"><button class="btn" id="go">Criar conta</button><button class="link" id="bk">Voltar ao login</button></div>`);
+ pickAvatar();$("#bk").onclick=()=>{view="login";render()};
+ $("#go").onclick=async()=>{const g=i=>$("#"+i).value.trim(),er=$("#er"),email=g("re").toLowerCase();
+  if(!g("rn")||!g("rt")||!email){er.textContent="Preencha nome, telefone e e-mail.";return}
+  if($("#rp").value.length<6){er.textContent="A senha precisa ter pelo menos 6 caracteres.";return}
+  if($("#rp").value!==$("#rc").value){er.textContent="As senhas não conferem.";return}
+  $("#go").disabled=true;
+  const {data,error}=await sb.auth.signUp({email,password:$("#rp").value,options:{emailRedirectTo:location.origin+location.pathname,data:{nome:g("rn"),tel:g("rt"),endereco:g("ra"),funcao:g("rf")}}});
+  $("#go").disabled=false;
+  if(error){er.textContent=trad(error.message);return}
+  if(data.user&&data.user.identities&&data.user.identities.length===0){er.textContent="Este e-mail já tem conta. Entre ou recupere a senha.";return}
+  try{if(pendAvatar)localStorage.setItem("gc_pending_foto",pendAvatar)}catch(e){}
+  if(!data.session){flash="Conta criada. Enviamos um e-mail de confirmação: abra o link e depois entre aqui.";view="login";render()}};
+}
+function renderForgot(){
+ $("#app").innerHTML=authShell(`<p class="sub">Informe o e-mail da conta. Enviaremos um link para criar uma nova senha.</p>
+ <label for="fe">E-mail</label><input id="fe" type="email">
+ <div class="err" id="er"></div>
+ <div class="row" style="margin-top:6px"><button class="btn" id="go">Enviar link</button><button class="link" id="bk">Voltar ao login</button></div>`);
+ $("#bk").onclick=()=>{view="login";render()};
+ $("#go").onclick=async()=>{const e=$("#fe").value.trim().toLowerCase();if(!e){$("#er").textContent="Informe o e-mail.";return}
+  $("#go").disabled=true;const {error}=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});$("#go").disabled=false;
+  if(error){$("#er").textContent=trad(error.message);return}
+  flash="Se este e-mail tiver conta, o link de recuperação já está a caminho.";view="login";render()};
+}
+function renderNewPass(){
+ $("#app").innerHTML=authShell(`<p class="sub">Crie a nova senha da sua conta.</p>
+ <label for="np">Nova senha</label><input id="np" type="password" autocomplete="new-password">
+ <label for="nc">Confirmar nova senha</label><input id="nc" type="password" autocomplete="new-password">
+ <div class="err" id="er"></div><div class="row" style="margin-top:6px"><button class="btn" id="go">Salvar nova senha</button></div>`);
+ $("#go").onclick=async()=>{if($("#np").value.length<6||$("#np").value!==$("#nc").value){$("#er").textContent="Use 6 caracteres ou mais e confirme a senha igual.";return}
+  const {error}=await sb.auth.updateUser({password:$("#np").value});if(error){$("#er").textContent=trad(error.message);return}
+  toast("Senha alterada.");bootedFor=USER.id;history.replaceState(null,"",location.pathname);enterApp()};
+}
+
+/* ---------- Painel ---------- */
+function renderApp(){
+ if(!USER){view="login";return render()}
+ const pr=S.profile||{};
+ $("#app").innerHTML=`<header><b>GC-Pedidos</b><div class="who"><span class="sync" id="sync"></span><span>${esc((pr.nome||"").split(" ")[0])}</span><div class="av" style="background-image:url(${pr.foto||""})"></div><button class="btn ghost sm" id="out" style="color:var(--hdt);border-color:var(--mut)">Sair</button></div></header>
+ <nav>${[["estoque","Estoque"],["fornecedores","Fornecedores"],["pedido","Novo pedido"],["historico","Histórico"],["perfil","Meu perfil"]].map(([k,n])=>`<button class="${tab===k?"on":""}" data-t="${k}">${n}</button>`).join("")}</nav>
+ <main id="main"></main>`;
+ $("#out").onclick=()=>sb.auth.signOut();
+ document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{tab=b.dataset.t;renderApp()});
+ ({estoque:tabEstoque,fornecedores:tabForn,pedido:tabPedido,historico:tabHist,perfil:tabPerfil})[tab]();
+}
+
+function queueSave(p){clearTimeout(timers[p.id]);setSync("Salvando…");
+ timers[p.id]=setTimeout(async()=>{delete timers[p.id];
+  const {error}=await sb.from("products").update({nome:p.nome,marca:p.marca,q1:p.q1,d1:p.d1||null,q2:p.q2,d2:p.d2||null,minimo:p.minimo,supplier_id:p.supplier_id||null}).eq("id",p.id);
+  setSync(error?"Erro ao salvar":"Salvo");if(error)toast("Não foi possível salvar. Verifique a conexão.")},600)}
+
+function tabEstoque(){
+ const so=v=>`<option value="">Sem fornecedor</option>`+S.suppliers.map(s=>`<option value="${s.id}" ${s.id===v?"selected":""}>${esc(s.nome)}</option>`).join("");
+ const rows=S.products.map(p=>{const t=tot(p),c=t<0?"neg":(p.minimo&&t<p.minimo?"low":"");return `<tr data-id="${p.id}">
+ <td><input data-f="nome" value="${esc(p.nome)}" placeholder="Produto"></td>
+ <td><input data-f="marca" value="${esc(p.marca)}" placeholder="Marca"></td>
+ <td><input data-f="q1" type="number" min="0" value="${p.q1}" style="width:80px"></td>
+ <td><input data-f="d1" type="date" value="${p.d1||""}"></td>
+ <td><input data-f="q2" type="number" min="0" value="${p.q2}" style="width:80px"></td>
+ <td><input data-f="d2" type="date" value="${p.d2||""}"></td>
+ <td class="tot ${c}" data-tot>${t}</td>
+ <td><input data-f="minimo" type="number" min="0" value="${p.minimo||0}" style="width:70px"></td>
+ <td><select data-f="supplier_id">${so(p.supplier_id)}</select></td>
+ <td><button class="btn ghost sm" data-del>Excluir</button></td></tr>`}).join("");
+ $("#main").innerHTML=`<div class="row"><button class="btn" id="add">Adicionar produto</button><button class="btn ghost" id="xl">Exportar para Excel</button><span class="sub" style="margin:0">Total = quantidade 1 (entrada) − quantidade 2 (saída). Alterações salvam sozinhas.</span></div>
+ <div class="tw"><table><thead><tr><th>Produto</th><th>Marca</th><th>Qtd. 1 (entrada)</th><th>Data entrada</th><th>Qtd. 2 (saída)</th><th>Data saída</th><th>Total em estoque</th><th>Mínimo</th><th>Fornecedor</th><th></th></tr></thead><tbody>${rows}</tbody></table>${S.products.length?"":`<div class="empty">Nenhum produto ainda. Toque em “Adicionar produto” para começar.</div>`}</div>`;
+ $("#xl").onclick=exportXlsx;
+ $("#add").onclick=async()=>{const {data,error}=await sb.from("products").insert({d1:new Date().toISOString().slice(0,10)}).select().single();if(error)return toast("Não foi possível adicionar o produto.");S.products.push(data);renderApp()};
+ document.querySelectorAll("#main tbody tr").forEach(tr=>{const p=S.products.find(x=>x.id===tr.dataset.id);
+  tr.querySelectorAll("[data-f]").forEach(el=>el.onchange=()=>{const f=el.dataset.f;p[f]=el.type==="number"?Math.max(0,Math.floor(+el.value||0)):el.value;queueSave(p);const t=tot(p),c=tr.querySelector("[data-tot]");c.textContent=t;c.className="tot "+(t<0?"neg":(p.minimo&&t<p.minimo?"low":""))});
+  tr.querySelector("[data-del]").onclick=async()=>{if(!confirm("Excluir este produto?"))return;const {error}=await sb.from("products").delete().eq("id",p.id);if(error)return toast("Não foi possível excluir.");S.products=S.products.filter(x=>x!==p);renderApp()}});
+}
+
+function tabForn(){
+ $("#main").innerHTML=`<div class="card" style="margin-bottom:14px"><b>Cadastrar fornecedor</b>
+ <div class="grid"><div><label for="sn">Nome da empresa</label><input id="sn"></div><div><label for="sw">WhatsApp do vendedor</label><input id="sw" type="tel" placeholder="(11) 98888-7777"></div></div>
+ <div class="err" id="er"></div><button class="btn" id="sa">Salvar fornecedor</button></div>
+ <div class="tw" style="min-width:0">${S.suppliers.length?S.suppliers.map(s=>{const n=S.products.filter(p=>p.supplier_id===s.id).length;return `<div class="sup"><div><b>${esc(s.nome)}</b><br><span class="sub" style="margin:0">${esc(s.whatsapp)} · ${n} produto${n===1?"":"s"} vinculado${n===1?"":"s"}</span></div><button class="btn ghost sm" data-d="${s.id}">Excluir</button></div>`}).join(""):`<div class="empty">Nenhum fornecedor cadastrado.</div>`}</div>`;
+ $("#sa").onclick=async()=>{const n=$("#sn").value.trim(),w=$("#sw").value.trim();if(!n||w.replace(/\D/g,"").length<10){$("#er").textContent="Informe o nome da empresa e um WhatsApp com DDD.";return}
+  const {data,error}=await sb.from("suppliers").insert({nome:n,whatsapp:w}).select().single();if(error){$("#er").textContent="Não foi possível salvar o fornecedor.";return}
+  S.suppliers.push(data);S.suppliers.sort((a,b)=>a.nome.localeCompare(b.nome));toast("Fornecedor salvo.");renderApp()};
+ document.querySelectorAll("[data-d]").forEach(b=>b.onclick=async()=>{if(!confirm("Excluir fornecedor? Os produtos ficam sem fornecedor."))return;
+  const {error}=await sb.from("suppliers").delete().eq("id",b.dataset.d);if(error)return toast("Não foi possível excluir.");
+  S.suppliers=S.suppliers.filter(s=>s.id!==b.dataset.d);S.products.forEach(p=>{if(p.supplier_id===b.dataset.d)p.supplier_id=null});renderApp()});
+}
+
+function tabPedido(){
+ if(!S.suppliers.length){$("#main").innerHTML=`<div class="card empty">Cadastre um fornecedor na aba Fornecedores e vincule produtos a ele na aba Estoque.</div>`;return}
+ if(!S.suppliers.some(s=>s.id===supSel))supSel=S.suppliers[0].id;
+ const s=S.suppliers.find(x=>x.id===supSel),ps=S.products.filter(p=>p.supplier_id===s.id&&p.nome);
+ $("#main").innerHTML=`<div class="row"><div style="min-width:220px"><label for="ss" style="margin-top:0">Fornecedor</label><select id="ss">${S.suppliers.map(x=>`<option value="${x.id}" ${x.id===supSel?"selected":""}>${esc(x.nome)}</option>`).join("")}</select></div></div>
+ <div class="tw" style="min-width:0">${ps.length?ps.map(p=>{const t=tot(p),falta=Math.max((p.minimo||0)-t,0),o=sel[p.id]||(sel[p.id]={on:false,q:falta||1});
+  return `<div class="ord"><input type="checkbox" data-c="${p.id}" ${o.on?"checked":""} aria-label="Selecionar ${esc(p.nome)}"><div><b>${esc(p.nome)}</b> <span class="sub" style="margin:0">${esc(p.marca)}</span><small class="${t<0?"neg":falta?"low":""}">Em estoque: ${t}${p.minimo?` · Mínimo: ${p.minimo}`:""}${falta?` · Faltam ${falta}`:""}</small></div><span class="sub" style="margin:0;text-align:right">Quantidade</span><input type="number" min="1" data-q="${p.id}" value="${o.q}"></div>`}).join(""):`<div class="empty">Nenhum produto vinculado a este fornecedor. Escolha o fornecedor na coluna “Fornecedor” da aba Estoque.</div>`}</div>
+ <div class="row" style="margin-top:12px"><button class="btn wa" id="send">Enviar pelo WhatsApp</button><button class="btn ghost" id="cp">Copiar pedido</button><span class="sub" style="margin:0" id="cnt"></span></div>`;
+ const user=S.profile||{};
+ const msg=()=>{const it=ps.filter(p=>sel[p.id]?.on&&sel[p.id].q>0);const L=it.map(p=>`• ${sel[p.id].q} x ${p.nome}${p.marca?" ("+p.marca+")":""}`);
+  return {it,txt:`Olá, ${s.nome}! Segue meu pedido:\n\n${L.join("\n")}\n\nSolicitante: ${user.nome}${user.funcao?" - "+user.funcao:""}\nTelefone: ${user.tel||""}${user.endereco?"\nEntrega: "+user.endereco:""}`}};
+ const upd=()=>{const n=msg().it.length;$("#cnt").textContent=n?`${n} item${n===1?"":"s"} no pedido`:"Marque os produtos que quer pedir.";$("#send").disabled=$("#cp").disabled=!n};upd();
+ $("#ss").onchange=e=>{supSel=e.target.value;renderApp()};
+ document.querySelectorAll("[data-c]").forEach(c=>c.onchange=()=>{sel[c.dataset.c].on=c.checked;upd()});
+ document.querySelectorAll("[data-q]").forEach(q=>q.onchange=()=>{sel[q.dataset.q].q=Math.max(1,Math.floor(+q.value||1));q.value=sel[q.dataset.q].q;upd()});
+ $("#send").onclick=()=>{const m=msg();window.open(waUrl(s.whatsapp,m.txt),"_blank","noopener");logOrder(s,m)};
+ $("#cp").onclick=()=>{navigator.clipboard?.writeText(msg().txt).then(()=>toast("Pedido copiado."),()=>toast("Não foi possível copiar."))};
+}
+async function logOrder(s,m){
+ const items=m.it.map(p=>({nome:p.nome,marca:p.marca,q:sel[p.id].q}));
+ const {data,error}=await sb.from("orders").insert({supplier_name:s.nome,supplier_wa:s.whatsapp,items,txt:m.txt}).select().single();
+ if(error){toast("O pedido foi enviado, mas não consegui guardar no histórico.");return}
+ S.orders.unshift(data);m.it.forEach(p=>sel[p.id].on=false);renderApp()}
+
+function tabHist(){const o=S.orders;
+ $("#main").innerHTML=o.length?`<div class="tw" style="min-width:0">${o.map(x=>`<div class="sup" style="align-items:flex-start"><div><b>${esc(x.supplier_name)}</b> <span class="sub" style="margin:0">${new Date(x.created_at).toLocaleString("pt-BR")}</span><br>${(x.items||[]).map(i=>`${esc(i.q)} x ${esc(i.nome)}${i.marca?" ("+esc(i.marca)+")":""}`).join("<br>")}</div><button class="btn wa sm" data-r="${x.id}">Reenviar</button></div>`).join("")}</div>`:`<div class="card empty">Nenhum pedido enviado ainda. Os pedidos enviados pelo WhatsApp aparecem aqui.</div>`;
+ document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{const x=o.find(y=>y.id===b.dataset.r);window.open(waUrl(x.supplier_wa,x.txt),"_blank","noopener")})}
+
+function exportXlsx(){
+ if(!window.XLSX){toast("A biblioteca do Excel não carregou. Verifique a conexão.");return}
+ const nm=id=>S.suppliers.find(s=>s.id===id)?.nome||"";
+ const est=[["Produto","Marca","Qtd. 1 (entrada)","Data entrada","Qtd. 2 (saída)","Data saída","Total em estoque","Mínimo","Fornecedor"],...S.products.map(p=>[p.nome,p.marca,p.q1,p.d1,p.q2,p.d2,tot(p),p.minimo||0,nm(p.supplier_id)])];
+ const ped=[["Data","Fornecedor","Qtd.","Produto","Marca"],...S.orders.flatMap(o=>(o.items||[]).map(i=>[new Date(o.created_at).toLocaleString("pt-BR"),o.supplier_name,i.q,i.nome,i.marca]))];
+ const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(est),"Estoque");XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(ped),"Pedidos");
+ try{dlFile("gc-pedidos-estoque.xlsx",new Blob([XLSX.write(wb,{type:"array",bookType:"xlsx"})],{type:"application/octet-stream"}));toast("Planilha exportada.")}catch(e){toast("Não foi possível exportar.")}}
+
+function tabPerfil(){
+ const p=S.profile||{};pendAvatar=p.foto||"";
+ $("#main").innerHTML=`<div class="card" style="max-width:520px"><div class="avatar" id="av" style="${p.foto?`background-image:url(${p.foto})`:""}">${p.foto?"":"Adicionar foto"}</div><input id="file" type="file" accept="image/*" hidden>
+ <label for="pn">Nome completo</label><input id="pn" value="${esc(p.nome)}">
+ <div class="grid"><div><label for="pt">Telefone WhatsApp</label><input id="pt" value="${esc(p.tel)}"></div><div><label for="pf">Função na empresa</label><input id="pf" value="${esc(p.funcao)}"></div></div>
+ <label for="pa">Endereço</label><input id="pa" value="${esc(p.endereco)}">
+ <label>E-mail</label><input value="${esc(USER.email)}" disabled>
+ <div class="err" id="er"></div><div class="row" style="margin-top:14px"><button class="btn" id="sv">Salvar perfil</button></div></div>`;
+ pickAvatar();
+ $("#sv").onclick=async()=>{const v={nome:$("#pn").value.trim()||p.nome,tel:$("#pt").value.trim(),funcao:$("#pf").value.trim(),endereco:$("#pa").value.trim(),foto:pendAvatar||null};
+  const {error}=await sb.from("profiles").update(v).eq("id",USER.id);if(error){$("#er").textContent="Não foi possível salvar o perfil.";return}
+  S.profile={...p,...v};toast("Perfil salvo.");renderApp()};
+}
+
+function render(){
+ if(!configured||!sb){return renderSetup()}
+ ({loading:renderLoading,login:renderLogin,register:renderRegister,forgot:renderForgot,newpass:renderNewPass,app:renderApp})[view]()}
+render();
+setTimeout(()=>{if(view==="loading"){view="login";render()}},8000);
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
